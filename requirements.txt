@@ -1,0 +1,8 @@
+click
+httpx 
+pydantic 
+pydantic-settings 
+aiosqlite 
+tenacity 
+rich 
+prompt-toolkit
