@@ -1,0 +1,5 @@
+Kurocode CLI is a Python-based terminal application that allows developers to access and interact with OpenRouter's free AI models directly from the command line. The goal is to provide a lightweight, fast, and developer-friendly alternative to web-based AI interfaces, enabling model discovery, interactive chatting, model switching, conversation history, and streaming responses entirely within the terminal.
+
+The tool should automatically fetch available free models from OpenRouter instead of relying on hardcoded model lists, ensuring that users always have access to the latest free models. It should support both one-off prompts and persistent interactive chat sessions while maintaining a clean and intuitive CLI experience.
+
+The project should be built using Python and Click, with a modular architecture that separates CLI commands, API communication, configuration management, and conversation storage.
