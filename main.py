@@ -1,15 +1,10 @@
 import click
+from commands import chat
 
-
-@click.command()
+@click.group()
 @click.version_option()
-@click.option("--name", prompt="Your name", help="The person to greet.")
-@click.option("--count", default=1, help="Number of greetings.")
-def hello(count, name):
-    """Simple program that greets NAME for a total of COUNT times."""
-    for _ in range(count):
-        click.echo(f"Hello, {name}!")
+def cli():
+    pass
 
 
-if __name__ == "__main__":
-    hello()
+cli.add_command(chat.hello)
