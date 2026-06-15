@@ -16,7 +16,7 @@ from kurocode.infra.openrouter_client import OpenRouterClient
 @click.argument("prompt", required=False)
 @click.option(
     "--model",
-    default="openai/gpt-4o-mini",
+    default="nvidia/nemotron-3-nano-30b-a3b:free",
     help="Model to use for the response.",
 )
 @click.pass_obj

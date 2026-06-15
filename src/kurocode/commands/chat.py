@@ -20,7 +20,7 @@ from kurocode.infra.store import ConversationStore
 @click.command()
 @click.option(
     "--model",
-    default="openrouter/owl-alpha",
+    default="openai/gpt-oss-20b:free",
     help="Model to use for the response.",
 )
 @click.option(
