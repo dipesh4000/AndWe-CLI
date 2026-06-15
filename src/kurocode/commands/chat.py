@@ -80,24 +80,39 @@ async def run_chat(ctx: CliContext, model: str, resume: str | None) -> None:
 
                 messages = session.to_openrouter_messages()
                 assistant_response: list[str] = []
+                tried_models = set()
 
-                try:
-                    if ctx.no_stream:
-                        resp = await client.chat(messages=messages, model=session.model_id)
-                        content = resp.choices[0].message.content
-                        assistant_response.append(content)
-                        ctx.renderer.stream_token(content)
+                while True:
+                    try:
+                        if ctx.no_stream:
+                            resp = await client.chat(messages=messages, model=session.model_id)
+                            content = resp.choices[0].message.content
+                            assistant_response.append(content)
+                            ctx.renderer.stream_token(content)
+                            ctx.renderer.end_stream()
+                        else:
+                            async for chunk in client.stream_chat(messages=messages, model=session.model_id):
+                                delta = chunk.choices[0].delta.content
+                                if delta:
+                                    ctx.renderer.stream_token(delta)
+                                    assistant_response.append(delta)
+                            ctx.renderer.end_stream()
+                        break
+                    except RateLimitError:
+                        tried_models.add(session.model_id)
+                        from kurocode.core.model_registry import ModelRegistry
+                        registry = ModelRegistry()
+                        fallback = await registry.get_fallback_model(session.model_id, tried_models)
+                        if not fallback:
+                            ctx.renderer.error(f"\n[Model {session.model_id} is exhausted and no fallback models are available.]")
+                            break
+                        
+                        ctx.renderer.info(f"\n[Model {session.model_id} is exhausted. Falling back to {fallback}...]")
+                        session.model_id = fallback
+                    except KeyboardInterrupt:
                         ctx.renderer.end_stream()
-                    else:
-                        async for chunk in client.stream_chat(messages=messages, model=session.model_id):
-                            delta = chunk.choices[0].delta.content
-                            if delta:
-                                ctx.renderer.stream_token(delta)
-                                assistant_response.append(delta)
-                        ctx.renderer.end_stream()
-                except KeyboardInterrupt:
-                    ctx.renderer.end_stream()
-                    ctx.renderer.info("\n[Stream interrupted. Saving partial response...]")
+                        ctx.renderer.info("\n[Stream interrupted. Saving partial response...]")
+                        break
                 
                 full_response = "".join(assistant_response)
                 if full_response:

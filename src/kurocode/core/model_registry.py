@@ -173,6 +173,14 @@ class ModelRegistry:
                 return cached
             raise
 
+    async def get_fallback_model(self, current_model: str, tried: set[str]) -> str | None:
+        """Find the next available free model that hasn't been tried."""
+        models = await self.fetch()
+        for m in models:
+            if m.id != current_model and m.id not in tried:
+                return m.id
+        return None
+
     # ------------------------------------------------------------------
     # Private helpers
     # ------------------------------------------------------------------
