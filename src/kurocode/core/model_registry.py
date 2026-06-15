@@ -54,8 +54,14 @@ class ModelInfo:
     @property
     def is_free(self) -> bool:
         """Return *True* when both prompt **and** completion pricing are zero."""
+        if self.id.endswith(":free") or self.id.endswith("/free") or self.id == "openrouter/free":
+            return True
+            
         p = self.pricing
-        return p.get("prompt") == "0" and p.get("completion") == "0"
+        try:
+            return float(p.get("prompt", "1")) == 0.0 and float(p.get("completion", "1")) == 0.0
+        except (ValueError, TypeError):
+            return False
 
 
 # ---------------------------------------------------------------------------
